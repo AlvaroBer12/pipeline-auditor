@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Auditoría SecOps - TFM</title>
+    <style>
+        :root {
+            --critical: #e74c3c; --high: #e67e22; --medium: #f1c40f; --low: #3498db; --dark: #2c3e50;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 40px; background-color: #f8f9fa; color: #333; }
+        h1 { color: var(--dark); border-bottom: 3px solid var(--dark); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Dashboard Cards */
+        .summary { display: flex; gap: 15px; margin-bottom: 25px; }
+        .card { flex: 1; padding: 15px; border-radius: 10px; color: white; text-align: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .card:hover { transform: translateY(-5px); }
+        .critical { background-color: var(--critical); } .high { background-color: var(--high); }
+        .medium { background-color: var(--medium); color: #333; } .low { background-color: var(--low); }
+
+        /* Controles de Filtro */
+        .controls { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .btn-filter { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; background: #eee; font-weight: bold; }
+        .btn-filter.active { background: var(--dark); color: white; }
+
+        /* Tabla */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: var(--dark); color: white; text-transform: uppercase; font-size: 0.85em; }
+        tr:hover { background-color: #fdfdfd; }
+        
+        .badge { padding: 5px 10px; border-radius: 15px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; }
+        .badge-critical { background: #fdeaea; color: var(--critical); border: 1px solid var(--critical); }
+        .badge-high { background: #fff4e5; color: var(--high); border: 1px solid var(--high); }
+        .badge-medium { background: #fffde7; color: #856404; border: 1px solid var(--medium); }
+        .badge-low { background: #ebf5fb; color: var(--low); border: 1px solid var(--low); }
+        
+        .hidden { display: none; }
+        .footer { margin-top: 40px; text-align: center; font-size: 0.8em; color: #95a5a6; }
+    </style>
+</head>
+<body>
+    <h1>
+        <span>Auditoría de Seguridad CI/CD</span>
+        <small style="font-size: 0.4em; color: #7f8c8d;">Archivo: {{FILENAME}}</small>
+    </h1>
+    
+    <p>Ejecutado el: <strong>{{DATE}}</strong></p>
+    
+    <div class="summary">
+        <div class="card critical" onclick="filterBySeverity('CRITICAL')"><h3>{{C_COUNT}}</h3>Critical</div>
+        <div class="card high" onclick="filterBySeverity('HIGH')"><h3>{{H_COUNT}}</h3>High</div>
+        <div class="card medium" onclick="filterBySeverity('MEDIUM')"><h3>{{M_COUNT}}</h3>Medium</div>
+        <div class="card low" onclick="filterBySeverity('LOW')"><h3>{{L_COUNT}}</h3>Low</div>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar por problema, ubicación o descripción...">
+        <button class="btn-filter active" onclick="filterBySeverity('ALL', this)">All</button>
+    </div>
+
+    <table id="auditTable">
+        <thead>
+            <tr>
+                <th>Severidad</th>
+                <th>Ubicación</th>
+                <th>Problema Detectado</th>
+                <th>Descripción y Recomendación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ROWS}}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <strong>TFM:</strong> Diseño e implementación de una herramienta de análisis estático | <strong>Autor:</strong> Álvaro Bermúdez Gámez
+    </div>
+
+    <script>
+        function filterTable() {
+            const input = document.getElementById("searchInput").value.toUpperCase();
+            const rows = document.querySelector("#auditTable tbody").rows;
+
+            for (let i = 0; i < rows.length; i++) {
+                const text = rows[i].textContent.toUpperCase();
+                rows[i].style.display = text.includes(input) ? "" : "none";
+            }
+        }
+
+        function filterBySeverity(severity, btn) {
+            // Actualizar botones
+            if(btn) {
+                document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+
+            const rows = document.querySelectorAll("#auditTable tbody tr");
+            rows.forEach(row => {
+                const rowSev = row.getAttribute("data-severity");
+                if (severity === 'ALL' || rowSev === severity) {
+                    row.classList.remove("hidden");
+                } else {
+                    row.classList.add("hidden");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
