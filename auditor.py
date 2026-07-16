@@ -25,7 +25,6 @@ class GitLabPipelineAuditor:
         self.check_advanced_policies()
         self.check_allow_failure()
         self.check_unverified_scripts()
-        self.check_environments()
         self.check_trusted_registries()
         return self.findings
 
@@ -47,7 +46,7 @@ class GitLabPipelineAuditor:
 
     def check_mandatory_security_tools(self):
         raw = str(self.pipeline_data).lower()
-        tools = {"Bandit": "SAST", "Trivy": "SCA", "Cosign": "Firma", "Syft": "SBOM", "Grype": "SCA"}
+        tools = {"Bandit": "SAST", "Trivy": "SCA", "Cosign": "Firma", "Syft": "SBOM"}
         for t, d in tools.items():
             if t.lower() not in raw:
                 self._add_finding("Definición", f"Falta {t}", "HIGH", f"No se detectó {t} para {d}.")
@@ -106,18 +105,6 @@ class GitLabPipelineAuditor:
                             "Descarga y ejecución al vuelo (Piping to shell) detectada. Riesgo masivo de Supply Chain si la URL es comprometida."
                         )
 
-    def check_environments(self):
-        for job, config in self.pipeline_data.items():
-            # Si el trabajo parece ser de despliegue, debe tener un entorno definido para aislar variables
-            if isinstance(config, dict) and 'deploy' in job.lower():
-                if 'environment' not in config:
-                    self._add_finding(
-                        job, 
-                        "Falta Restricción de Entorno", 
-                        "MEDIUM", 
-                        "Trabajo de despliegue sin 'environment'. Las variables secretas no están restringidas y vulneran el Mínimo Privilegio."
-                    )
-    
     def check_trusted_registries(self):
         # Define aquí los registros que consideras seguros para tu empresa/proyecto
         trusted_prefixes = ['registry.gitlab.com', 'gcr.io', 'quay.io'] 
