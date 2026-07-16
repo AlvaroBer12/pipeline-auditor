@@ -183,6 +183,11 @@ class GitLabPipelineAuditor:
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(html_content)
         print(f"Reporte interactivo generado en: {output_file}")
+        
+        if counts['CRITICAL'] > 0 or counts['HIGH'] > 0:
+            print("\n[!] SECURITY GATE: Se han detectado vulnerabilidades CRÍTICAS o ALTAS en la configuración.")
+            print("[!] Abortando el pipeline inmediatamente (Fail-Fast).")
+            sys.exit(1) # Esto le dice a GitLab que el Job ha fallado
 
 if __name__ == "__main__":
     auditor = GitLabPipelineAuditor(".gitlab-ci.yml")
