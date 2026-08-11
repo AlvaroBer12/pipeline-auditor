@@ -64,7 +64,7 @@ class GitLabPipelineAuditor:
         keys = ['PASSWORD', 'SECRET', 'TOKEN', 'KEY', 'AUTH']
         for n, v in vars.items():
             if any(k in n.upper() for k in keys) and isinstance(v, str) and not v.startswith('$'):
-                self._add_finding(f"Variable: {n}", "Secreto Expuesto", "CRITICAL", "Contraseña en texto plano.")
+                self._add_finding(f"Variable: {n}", "Secreto expuesto", "CRITICAL", "Contraseña en texto plano.")
 
     def check_advanced_policies(self):
         for job, config in self.pipeline_data.items():
