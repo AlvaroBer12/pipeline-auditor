@@ -80,7 +80,7 @@ class GitLabPipelineAuditor:
             if isinstance(config, dict) and config.get('allow_failure') is True:
                 self._add_finding(
                     job, 
-                    "Evasión de Fallos (allow_failure)", 
+                    "Evasión de fallos (allow_failure)", 
                     "CRITICAL", 
                     "Contiene 'allow_failure: true'. GitLab ignorará los errores y anulará el Security Gate."
                 )
