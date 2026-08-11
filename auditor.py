@@ -38,7 +38,7 @@ class GitLabPipelineAuditor:
             for n, v in variables.items():
                 if any(k in n.upper() for k in ['TAG', 'IMAGE', 'DIGEST']):
                     if isinstance(v, str) and ':' in v and '@sha256:' not in v:
-                        self._add_finding(f"Var: {n}", "Etiqueta Mutable", "MEDIUM", f"Tag: {v}")
+                        self._add_finding(f"Var: {n}", "Etiqueta mutable", "MEDIUM", f"Tag: {v}")
         
         global_img = self.pipeline_data.get('image')
         if global_img and '@sha256:' not in str(global_img):
@@ -71,9 +71,9 @@ class GitLabPipelineAuditor:
             if not isinstance(config, dict): continue
             script = str(config.get('script', [])).lower()
             if script and '$erroractionpreference = "stop"' not in script:
-                self._add_finding(job, "Política Insegura", "MEDIUM", "Falta '$ErrorActionPreference = Stop'.")
+                self._add_finding(job, "Política insegura", "MEDIUM", "Falta '$ErrorActionPreference = Stop'.")
             if config.get('artifacts') and 'expire_in' not in config.get('artifacts'):
-                self._add_finding(job, "Artefacto sin Expiración", "LOW", "Falta 'expire_in'.")
+                self._add_finding(job, "Artefacto sin expiración", "LOW", "Falta 'expire_in'.")
     
     def check_allow_failure(self):
         for job, config in self.pipeline_data.items():
@@ -100,9 +100,9 @@ class GitLabPipelineAuditor:
                     if ('curl ' in line_str or 'wget ' in line_str) and ('| bash' in line_str or '| sh' in line_str):
                         self._add_finding(
                             job, 
-                            "Ejecución de Script Externo", 
+                            "Ejecución de script externo", 
                             "HIGH", 
-                            "Descarga y ejecución al vuelo (Piping to shell) detectada. Riesgo masivo de Supply Chain si la URL es comprometida."
+                            "Descarga y ejecución al vuelo (Piping to shell) detectada. Riesgo de Supply Chain."
                         )
 
     def check_trusted_registries(self):
@@ -117,7 +117,7 @@ class GitLabPipelineAuditor:
             if not any(img_name.startswith(prefix) for prefix in trusted_prefixes):
                 self._add_finding(
                     loc, 
-                    "Registro No Confiable", 
+                    "Registro no confiable", 
                     "MEDIUM", 
                     f"Imagen base '{img_name}' descargada de registro público sin proxy de seguridad."
                 )
