@@ -102,7 +102,7 @@ class GitLabPipelineAuditor:
                             job, 
                             "Ejecución de script externo", 
                             "HIGH", 
-                            "Descarga y ejecución al vuelo (Piping to shell) detectada. Riesgo de Supply Chain."
+                            "Descarga detectada. Riesgo de Supply Chain."
                         )
 
     def check_trusted_registries(self):
