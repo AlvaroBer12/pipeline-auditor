@@ -31,7 +31,6 @@ class GitLabPipelineAuditor:
     def _add_finding(self, loc, issue, severity, msg):
         self.findings.append({"loc": loc, "issue": issue, "severity": severity, "msg": msg})
 
-    # (Las funciones de check_... se mantienen igual que en la versión anterior)
     def check_immutable_images(self):
         variables = self.pipeline_data.get('variables', {})
         if isinstance(variables, dict):
@@ -106,10 +105,8 @@ class GitLabPipelineAuditor:
                         )
 
     def check_trusted_registries(self):
-        # Define aquí los registros que consideras seguros para tu empresa/proyecto
         trusted_prefixes = ['registry.gitlab.com', 'gcr.io', 'quay.io'] 
         
-        # Función auxiliar para comprobar una imagen
         def verificar_imagen(img, loc):
             img_name = str(img.get('name', img) if isinstance(img, dict) else img)
             # Ignoramos si es un servicio de docker-in-docker común
@@ -122,11 +119,9 @@ class GitLabPipelineAuditor:
                     f"Imagen base '{img_name}' descargada de registro público sin proxy de seguridad."
                 )
 
-        # Revisar imagen global
         if self.pipeline_data.get('image'):
             verificar_imagen(self.pipeline_data['image'], "Global")
                 
-        # Revisar imágenes de cada trabajo
         for job, config in self.pipeline_data.items():
             if isinstance(config, dict) and 'image' in config:
                 verificar_imagen(config['image'], job)
