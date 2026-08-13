@@ -67,10 +67,16 @@ class GitLabPipelineAuditor:
 
     def check_advanced_policies(self):
         for job, config in self.pipeline_data.items():
+            if job in ['stages', 'variables', 'default', 'image', 'services', 'workflow']: 
+                continue
+                
             if not isinstance(config, dict): continue
-            script = str(config.get('script', [])).lower()
-            if script and '$erroractionpreference = "stop"' not in script:
-                self._add_finding(job, "Política insegura", "MEDIUM", "Falta '$ErrorActionPreference = Stop'.")
+            
+            if 'script' in config:
+                script = str(config['script']).lower()
+                if '$erroractionpreference = "stop"' not in script:
+                    self._add_finding(job, "Política insegura", "MEDIUM", "Falta '$ErrorActionPreference = Stop'.")
+            
             if config.get('artifacts') and 'expire_in' not in config.get('artifacts'):
                 self._add_finding(job, "Artefacto sin expiración", "LOW", "Falta 'expire_in'.")
     
