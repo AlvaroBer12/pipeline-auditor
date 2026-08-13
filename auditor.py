@@ -162,7 +162,7 @@ class GitLabPipelineAuditor:
             "{{H_COUNT}}": str(counts['HIGH']),
             "{{M_COUNT}}": str(counts['MEDIUM']),
             "{{L_COUNT}}": str(counts['LOW']),
-            "{{ROWS}}": rows_html if rows_html else '<tr><td colspan="4" style="text-align:center;">¡Felicidades! No se detectaron vulnerabilidades.</td></tr>'
+            "{{ROWS}}": rows_html if rows_html else '<tr><td colspan="4" style="text-align:center;">No se detectaron vulnerabilidades.</td></tr>'
         }
 
         for placeholder, value in replacements.items():
